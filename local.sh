@@ -35,6 +35,6 @@ ssh $node2 << EOF
 	fi
 EOF
 
-ssh $node0 bash UWMadisonCS744/cloudlabnode.sh
-ssh $node1 bash UWMadisonCS744/cloudlabnode.sh
-ssh $node2 bash UWMadisonCS744/cloudlabnode.sh
+#ssh $node0 bash UWMadisonCS744/cloudlabnode.sh
+#ssh $node1 bash UWMadisonCS744/cloudlabnode.sh
+#ssh $node2 bash UWMadisonCS744/cloudlabnode.sh
