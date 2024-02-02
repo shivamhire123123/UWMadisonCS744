@@ -7,7 +7,9 @@ if [ "" = "$PKG_OK" ]; then
 	sudo apt-get --yes install $REQUIRED_PKG
 fi
 if [ ! -d "/mnt/data" ]; then
+	echo "Mounting /mnt/data"
 	sudo mkfs.ext4 /dev/xvda4
 	sudo mkdir -p /mnt/data
 	sudo mount /dev/xvda4 /mnt/data
+	echo "Mounting /mnt/data complete!!"
 fi
