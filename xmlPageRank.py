@@ -1,9 +1,11 @@
 from pyspark import SparkConf, SparkContext
-import os
 
 def parse_line(line):
     """Parse a line of the input data."""
-    parts = line.split()
+    parts = line.split('\t')
+    print("***********")
+    print(parts)
+    print("*"*8)
     return parts[0], parts[1]
 
 def compute_contributions(urls, rank):
@@ -28,34 +30,21 @@ def pagerank_iterate(links, ranks):
     new_ranks = new_ranks.mapValues(lambda rank: damping_factor * rank + jump_factor)
 
     return new_ranks
-
 if __name__ == "__main__":
 
     # Set up Spark
     conf = SparkConf().setAppName("PageRank")
     sc = SparkContext(conf=conf)
+
     # Load input data from HDFS
-    input_path = "hdfs://10.10.1.1:9000/wiki_articles/enwiki-pages-articles/"
-
-    path = "/proj/uwmadison744-s24-PG0/data-part3/enwiki-pages-articles/"
-    files = [input_path + filename for filename in os.listdir(path) if ".xml" in filename]
-
-    appended_rdd = sc.textFile(files[0])
-
-    for file_name in files[1:]:
-        lines = sc.textFile(file_name)
-        appended_rdd = appended_rdd.union(lines)
-
-    lines = appended_rdd
-    #lines = sc.textFile(input_path)
-    #lines_prdd = sc.wholeTextFiles(input_path).values()
-    #lines = lines_prdd.persist()
+    input_path = "hdfs://10.10.1.1:9000/concatenated_output.xml"
+    lines = sc.textFile(input_path)
     print("Type of lines : = ",type(lines))
+
     # Parse the input data
     links = lines.map(parse_line).distinct().groupByKey()
-    #num_pages = links.count()
-
-    print("Type of links = ",type(links))
+    num_pages = links.count()
+    print("num pages = ",num_pages)
 
     # Initialize ranks
     ranks = links.mapValues(lambda v: 1.0)
@@ -64,18 +53,8 @@ if __name__ == "__main__":
     for iteration in range(3):
         ranks = pagerank_iterate(links, ranks)
 
-    print("Type of ranks = ",type(ranks))
     # Output the final PageRank results
-    results = ranks.collect()
-    #result_ll = ranks.map( lambda elem: list(elem))
+    #results = ranks.collect()
 
-    idx = 0
-    print("Ranks computed")
-    #for result in ranks:
-     #   idx = idx + 1
-      #  if idx == 10:
-      #      break
-      #  print(f"{result[0]}: {result[1]}")
-
-    # Stop Spark
+    ranks.coalesce(1).saveAsTextFile("hdfs://10.10.1.1:9000/wiki_pagerank_results.txt")
     sc.stop()
