@@ -14,10 +14,10 @@ def compute_contributions(urls, rank):
     for url in urls:
         yield (url, rank / num_urls)
 
-def pagerank_iterate(links, ranks):
+def pagerank_iterate(links, ranks, partitions):
     """Perform one iteration of the PageRank algorithm."""
     # Calculate URL contributions to the rank of other URLs
-    contributions = links.join(ranks).partitionBy(400).flatMap(
+    contributions = links.join(ranks).partitionBy(partitions).flatMap(
         lambda x: compute_contributions(x[1][0], x[1][1])
     )   
 
@@ -31,13 +31,20 @@ def pagerank_iterate(links, ranks):
 
     return new_ranks
 if __name__ == "__main__":
+    # Parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str)
+    parser.add_argument('--output', type=str)
+    parser.add_argument('--partitions', type=int)
+    args = parser.parse_args()
 
+    
     # Set up Spark
     conf = SparkConf().setAppName("PageRank")
     sc = SparkContext(conf=conf)
 
     # Load input data from HDFS
-    input_path = "hdfs://10.10.1.1:9000/concatenated_output.xml"
+    input_path = args.input #"hdfs://10.10.1.1:9000/concatenated_output.xml"
     lines = sc.textFile(input_path)
     print("Type of lines : = ",type(lines))
 
@@ -51,10 +58,10 @@ if __name__ == "__main__":
 
     # Perform 10 iterations of PageRank
     for iteration in range(3):
-        ranks = pagerank_iterate(links, ranks)
+        ranks = pagerank_iterate(links, ranks, args.partitions)
 
     # Output the final PageRank results
     #results = ranks.collect()
 
-    ranks.coalesce(1).saveAsTextFile("hdfs://10.10.1.1:9000/wiki_pagerank_results.txt")
+    ranks.coalesce(1).saveAsTextFile(args.output) #"hdfs://10.10.1.1:9000/wiki_pagerank_results.txt")
     sc.stop()
