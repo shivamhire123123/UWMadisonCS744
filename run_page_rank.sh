@@ -5,4 +5,4 @@ time /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
   /mnt/data/page_rank/xmlPageRank.py \
   --input hdfs://10.10.1.1:9000/web-BerkStan.txt \
   --output hdfs://10.10.1.1:9000/result1 \
-  --partition 16
+  --partition 4
