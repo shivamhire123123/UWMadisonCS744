@@ -1,0 +1,2 @@
+Setup Hadoop and Spark as detailed in https://pages.cs.wisc.edu/~shivaram/cs744-sp24/assignment1.html. Placed Hadoop, Spark and this folder in /mnt/data/
+Run ./run.sh in each task folder

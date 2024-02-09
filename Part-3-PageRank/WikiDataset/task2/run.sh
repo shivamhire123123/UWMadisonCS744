@@ -23,7 +23,7 @@ echo "Deleted Previous Wiki Page Rank Results (if existing)"
 
 time /mnt/data/spark-3.3.4-bin-hadoop3/bin/spark-submit \
   --master spark://node0.cs744s24-g22.uwmadison744-s24-pg0.wisc.cloudlab.us:7077 \
-  /mnt/data/page_rank/wikiDataset/pageRank.py \
+  /mnt/data/WikiDataset/task2/pageRank.py \
   --input hdfs://10.10.1.1:9000/concatenated_input.xml \
   --output hdfs://10.10.1.1:9000/wiki_pagerank_results.txt \
   --partitions 4
