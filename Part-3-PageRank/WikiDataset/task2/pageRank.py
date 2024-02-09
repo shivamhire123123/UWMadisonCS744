@@ -43,16 +43,17 @@ if __name__ == "__main__":
 
     # Load input data from HDFS
     lines = sc.textFile(args.input)
+    lines = lines.filter(lambda line:'#' not in line)
 
     # Parse the input data
-    links = lines.map(parse_line).distinct().groupByKey()
+    links = lines.map(parse_line).groupByKey()
     links.persist()
 
     # Initialize ranks
     ranks = links.mapValues(lambda v: 1.0)
 
     # Perform 10 iterations of PageRank
-    for iteration in range(1):
+    for iteration in range(10):
         ranks = pagerank_iterate(links, ranks, args.partitions)
 
     # Output the final PageRank results
